@@ -83,6 +83,7 @@ SemantEco is, at its core, a Java Servlet 3.0\footnote{http://jcp.org/aboutJava/
 The SemantEco servlet is, at its core, a `plug-and-play' architecture. The servlet mostly provides glue code that is responsible for combining functionality of different modules. A \textit{module} is a self-contained Java Archive that provides functionality to SemantEco via different methods. The specifics of how modules work will be discussed in Chapter~\ref{writing-modules}.
 
 \subsection{Special URL Patterns}
+\label{url-patterns}
 The SemantEco responds to a number of URL patterns that require custom processing. These include:
 \begin{itemize}
 \item \texttt{/js/config.js} -- Client configuration specific to the SemantEco deployment, including the base URL for the deployment and where to submit RESTful calls.
@@ -144,12 +145,55 @@ In this section we will introduce the Query Executor as the key tool for modules
 In this section we will discuss how SemantEco uses the \texttt{@QueryMethod} annotation in order to generate communication code between client and server. 
 
 \subsection{Query Methods}
+To facilitate interaction between SemantEco clients and the SemantEco server, the framework provides an annotation for module designers called \texttt{QueryMethod} that allows the designer to identify Java methods that should be callable from client-side code. For each module with at least one \texttt{QueryMethod}, the framework will provide a \texttt{<script>} element in index.jsp under the \texttt{/js/modules/} path mentioned in Section~\ref{url-patterns}. The browser will attempt to load this script from this URL, which prompts SemantEco to generate the necessary glue code to support the call. This operation is done in the JavaScript generator.
 
 \subsubsection{The JavaScript Generator}
+The JavaScript generator is a utility class that is responsible for standardizing the client-server communication code to limit potential errors on the part of module designers. Each module has its \texttt{QueryMethod}s exposed in exactly the same way and any requests to these methods from the clients are processed in exactly the same way by the SemantEco servlet. The general flow of the JavaScript generator is as follows:
+
+\begin{enumerate}
+\item Begin by generating an empty JavaScript object assigned to a variable with the same name as the Java class.
+\item For a given module, use the Java Reflect API to obtain a list of all methods defined on the module.
+\item For each method, examine its annotation set to determine if the method has the \texttt{QueryMethod} annotation.
+\item If the method is annotated as a \texttt{QueryMethod}, add a key/value pair to the JavaScript object in \#1 where the key is the name of the method and the value is a function that takes a dictionary of arguments, a success function, and an optional error function and performs the following actions:
+\begin{enumerate}
+\item Extend the SemantEco state with any optional arguments given in the arguments parameter. If an argument appears in both the state and the arguments object, the value in the arguments is used.
+\item Using jQuery, execute an Asynchronous JavaScript and XML (AJAX) to the server at a predetermined URL in the form of \texttt{/rest/<module-name>/<method-name>}.
+\item Set the success and error handlers on the AJAX request so the appropriate functions are called when the request completes.
+\end{enumerate}
+\item If at least one method was a \texttt{QueryMethod} return the final object back to the servlet so it can be sent to the client, otherwise return nothing.
+\end{enumerate}
 
 \subsubsection{The Request Object}
+When a \texttt{QueryMethod} is called from a client, it is intercepted by the SemantEco servlet's \texttt{doGet} method. This method identifies the request as a RESTful call to a module and proceeds to parse the parameters sent by the client into the appropriate types. This information is then encapsulated in a \texttt{Request} object that can be passed to the module/method combination identified in the URL. In addition to providing modules access to the parameters of a REST call, the \texttt{Request} object also provides the following methods:
 
-\subsection{Debugging Techniques}
+\begin{itemize}
+\item\textbf{getLogger} - Gets an Apache log4j Logger customized for the specific request if the client sent a valid identifier for a known WebSocket outbound channel (see Section~\ref{debugging-techniques} for more details).
+\item\textbf{getModel} - Gets the \texttt{OntModel} containing all of the ontologies for every active module based on the \textbf{Request}'s parameters. If the \texttt{OntModel} has not yet been constructed, this will cause one to be created and the \texttt{ModuleManager} will call each active module's \texttt{visit(OntModel)} method.
+\item\textbf{getDataModel} - Gets the \texttt{Model} containing all of the data for every active module based on the \textbf{Request}'s parameters. If the \texttt{Model} has not yet been constructed, this will cause one to be created and the \texttt{ModuleManager} will call each active module's \texttt{visit(Model)} method.
+\item\textbf{getCombinedModel} - Gets a combined \texttt{Model} that contains the contents of both the ontology model and data model. If either model has yet to be built this will construct the missing models first following the steps above.
+\end{itemize}
+
+It is important to note that the results of each of the above methods caches its results until the processing of the \texttt{Request} completes, i.e. multiple calls to these methods will not incur any additional time penalties after the model is first built.
+
+\section{Debugging Techniques}
+\label{debugging-techniques}
+This section discusses some of the debugging techniques that designers can use in the construction and debugging of modules.
+
+\subsection{Web Sockets}
+To ease debugging server behavior during client actions, SemantEco uses the Web Socket specification to open up a persistent connection between the client and server if the client supports it. This occurs during the client's initialization procedure. If the Web Socket initialization is successful, the SemantEco servlet stores a reference to the socket and sends back a hash of the socket's reference that the client stores in a cookie. In future requests, the servlet will attempt to read the cookie and, if the hash identifies an open socket, will use that socket to generate a \texttt{LoggerWrapper} object that wraps the \texttt{Request}'s default logger and sends copies of all log statements to the client. Log statements received on the client via the Web Socket are printed to the client's console. Messages may still be blocked if the log level on the server is too high for the type of log required (e.g. the developer wishes to see DEBUG messages but the server is configured for INFO and higher).
+
+\subsection{Remote Java Debugging}
+In addition to using a Logger object to log events as they occur, it is also useful for designers to step through code and examine variables to identify potential logic issues and correct them. Because SemantEco uses the Maven build system it is generally the case that Eclipse does not recognize it as a servlet. Therefore, debugging the servlet is a more involved process than general servlet development done entirely in Eclipse. To debug SemantEco one should do the following:
+
+\begin{enumerate}
+\item Start Tomcat with \texttt{./catalina.sh jpda start} rather than \texttt{./startup.sh}. This enables the Java Platform Debugger Architecture in Tomcat's Java Virtual Machine.
+\item In Eclipse, create a new Debug configuration for the SemantEco web app.
+\item Add a new \textit{Remote Java Application} configuration.
+\item Optionally, check the option that this configuration be included in the ``Favorites'' list.
+\item Press the ``Debug'' button to connect to the virtual machine running Tomcat.
+\end{enumerate}
+
+Now, as Tomcat executes SemantEco code it will cause Eclipse to stop at any breakpoints set by the developer.
 
 \chapter{Semantic Model}
 \label{semantic-model}
