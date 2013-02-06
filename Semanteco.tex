@@ -109,7 +109,20 @@ If a module is not needed or is acting faulty it can be removed from the system.
 \subsection{Visiting Modules}
 
 \section{ModuleConfiguration}
-Going to add a discussion here about what the ModuleConfiguration provides.
+When each module is instantiated by the \texttt{ModuleManager}, the \texttt{ModuleManager} passes the module an instance of \texttt{ModuleConfiguration} via the module's \texttt{setModuleConfiguration} method. Modules that wish to execute queries or retrieve runtime information about available domains, etc., should save the reference to the \texttt{ModuleConfiguration} object.
+
+The \texttt{ModuleConfiguration} object provides a number of useful methods for the module:
+
+\begin{itemize}
+\item\textbf{getSparqlEndpoint} - Retrieves the default SPARQL endpoint that will execute queries for this module. This can be overridden by calling a \texttt{QueryFactory}'s \texttt{execute} method that takes an endpoint URL.
+\item\textbf{getQueryFactory} - Obtains a \texttt{QueryFactory} the module can use to instantiate \texttt{Query} objects.
+\item\textbf{getQueryExecutor} - Obtains a \texttt{QueryExecutor} the module can use for executing queries either on remote endpoints (such as the default endpoint returned by getSparqlEndpoint) or the local model after all modules have populated it with content relevant to the actively processed \texttt{Request} object.
+\item\textbf{getResource} - Obtains a reference to a resource in the module's \texttt{META-INF/res} directory so that it can be added to the user interface.
+\item\textbf{generateStringResource} - Generates a resource object from a string; this is primarily used for generating dynamic content based on SPARQL queries.
+\item\textbf{getLogger} - Gets the default Apache log4j\footnote{http://logging.apache.org/log4j/1.2/} Logger for the module.
+\item\textbf{getDomain} - Gets or creates a \texttt{Domain} object for a given URI; this should only be called by modules that also implement \texttt{ProvidesDomain} (note: SemantEco does not enforce this but interaction with domains are limited if a module is not also an implementation of \texttt{ProvidesDomain}).
+\item\textbf{listDomains} - Returns a \texttt{java.util.List} of all domains know to SemantEco at the time it is called.
+\end{itemize}
 
 \section{The Query Executor}
 \label{query-executor}
