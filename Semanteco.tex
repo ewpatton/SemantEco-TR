@@ -72,6 +72,9 @@ SemantEco is an amalgamation of many different ontologies and as such this techn
 \item BBQ - jQuery Back button and Query library; useful for providing navigation and state features in single-page web applications
 \end{itemize}
 
+\section{Where To Begin}
+Readers interested in getting a general overview of how SemantEco is structured architectural should be able to read this document in order. Chapters are arranged such that having an understanding of earlier chapters provides a general background for future chapters. For readers interested in the application flow from a server perspective, Section \ref{servlet} introduces the SemantEco servlet and how it is initialized server side. For readers interested in the client-side application flow, Section \ref{index.jsp} introduces the SemantEco interface described in its index.jsp and walks through how it and the other user interface components operate.
+
 \chapter{Architecture Design}
 \label{architecture}
 In this chapter we will discuss the architecture of the new SemantEco, from its adherence to the Java Servlet Specification so that it can be deployed in many different environments to its method of executing modules and queries to accomplish user tasks. We will also discuss how the RESTful client-server communication works to enable SemantEco both as a web application and as a web service.
@@ -230,7 +233,8 @@ In this section we will instruct the reader how to make use of the semantic mode
 \label{user-interface}
 In this chapter we will provide an overview of the different components in the SemantEco interface and how modules use them to provide users with tools for controlling data search.
 
-\section{The Semantic Entry Point: index.jsp} 
+\section{The Semantic Entry Point: index.jsp}
+\label{index.jsp}
 When a user opens SemantEco in her browser, the servlet container compiles and executes the Java Servlet Page (JS) index.jsp, which can be found in SemantEco's webapp directory. This file provides the primary interface for users to access data provided by the various SemantEco modules and it is automatically generated through the use of a tag library and the SemantEcoUI object constructed by the ModuleManager when it visits each of the available modules, which will be discussed in Section~\ref{facets}.
 
 \subsection{The SemantEco Tag Library}
