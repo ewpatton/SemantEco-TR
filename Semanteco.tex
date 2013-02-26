@@ -243,14 +243,16 @@ In this chapter we will provide an overview of the different components in the S
 
 \section{The Semantic Entry Point: index.jsp}
 \label{index.jsp}
-When a user opens SemantEco in her browser, the servlet container compiles and executes the Java Servlet Page (JS) index.jsp, which can be found in SemantEco's webapp directory. This file provides the primary interface for users to access data provided by the various SemantEco modules and it is automatically generated through the use of a tag library and the SemantEcoUI object constructed by the ModuleManager when it visits each of the available modules, which will be discussed in Section~\ref{facets}.
+When a user opens SemantEco in her browser, the servlet container compiles and executes the Java Servlet Page (JSP) index.jsp, which can be found in SemantEco's webapp directory. This file provides the primary interface for users to access data provided by the various SemantEco modules and it is automatically generated through the use of a tag library and the \texttt{SemantEcoUI} object constructed by the \texttt{ModuleManager} when it visits each of the available modules, which will be discussed in Section~\ref{facets}.
 
 \subsection{The SemantEco Tag Library}
-SemantEco provides a Java Servlet Page tag library that simplifies the generation of the main page by condensing references to the various scripts, stylesheets, and facets provided by the different modules into three separate tags: \texttt{<module:scripts />}, \texttt{<module:styles />}, and \texttt{<module:facets />}. The module namespace is explicitly defined by the Tag Library Description (TLD) \texttt{WEB-INF/semanteco.tld} in the web application. The implementations of the tag handlers for these tags are located in the \texttt{edu.rpi.tw.escience.semanteco.taglib} package. For a complete overview of JSP tag handlers see \cite{JSPTagHandlers}.
-
-\subsubsection{The Scripts Tag}
+SemantEco provides a Java Servlet Page tag library that simplifies the generation of the main page by condensing references to the various scripts, stylesheets, and facets provided by the different modules into three separate tags: \texttt{<module:scripts />}, \texttt{<module:styles />}, and \texttt{<module:facets />}. The module namespace is explicitly defined by the Tag Library Description (TLD) \texttt{WEB-INF/semanteco.tld} in the web application. The implementations of the tag handlers for these tags are located in the \\\texttt{edu.rpi.tw.escience.semanteco.taglib} package. For a complete overview of JSP tag handlers see \cite{JSPTagHandlers}.
 
 \subsubsection{The Styles Tag}
+The styles tag pulls all of the resources from the \texttt{SemantEcoUI} object that were added via its \\\texttt{addStylesheet(Resource)} method. These are inserted by the styles tag handler as HTML \texttt{$<$link$>$} elements. It is important to note that module stylesheets are added in the order that modules are instantiated by the \texttt{ModuleManager} and in which the module adds them to the \texttt{SemantEcoUI} object. Therefore, it is advisable to tag a module's \texttt{div} element with an \texttt{id} attribute and then structure module-specific CSS around the particular \texttt{id} to prevent potential conflicts with other modules.
+
+\subsubsection{The Scripts Tag}
+Like stylesheets, the scripts tag pulls all of the resources in \texttt{SemantEcoUI} added via its \\\texttt{addScripts(Resource)} method. It is also responsible for including references to the auto-generated JavaScript code used to provide client-server REST communication. These generated scripts are added first followed by module-specific resources, which allows the module-specific client code to manipulate the module object on the client side. For example, the RegulationModule provides QueryMethods, causing SemantEco to generate a JavaScript object named RegulationModule on the client, and the additional behavior added by regulation.js augments the RegulationModule object with additional functions that can be called as part of the client-side application flow. This design allows module engineers to neatly collect module-specific behavior into a single client-side object.
 
 \subsubsection{The Facets Tag}
 
@@ -258,9 +260,22 @@ SemantEco provides a Java Servlet Page tag library that simplifies the generatio
 \section{Map Interface}
 \label{maps}
 In this section we will discuss how SemantEco presents known sites on a map interface.
+
 \section{Module Facets}
 \label{facets}
-In this section we will inform the reader of how modules expose facets to the user as well as how they can control what information from the facet is used during client-server communication.
+%In this section we will inform the reader of how modules expose facets to the user as well as how they can control what information from the facet is used during client-server communication.
+\texttt{Module}s add facets to the SemantEco user interface via their \texttt{visit(SemantEcoUI, Request)} methods. In order for a \texttt{Module} to provide a facet to the user interface, it must store a reference to the configuration supplied by the ModuleManager via the setModuleConfiguration method. The configuration object provides two methods, \texttt{getResource(String)} and \texttt{generateStringResource(String)}, that can be used to obtain Resource references to files (e.g. HTML or JSP) on disk or to programmatically constructed resources, respectively. Resources must be placed in the \texttt{META-INF/res/} directory for SemantEco to locate them. To take advantage of the automatic parameter serialization mechanisms provided by SemantEco, a \texttt{Module}'s facet must be wrapped in a \texttt{$<$div$>$} element whose class attribute must contain the keyword ``facet'', e.g.
+
+\begin{verbatim}
+<div class="facet">
+<!-- more HTML here -->
+</div>
+\end{verbatim}
+
+Any \texttt{$<$input$>$} or \texttt{$<$select$>$} element with a facet \texttt{div} will be used to populate the jQuery BBQ state used to communicate application parameters between client and server. When SemantEco initializes, its client-side user interface (SemantEcoUI.js) code locates all facet elements and uses their default states to populate the jQuery BBQ state. In the event that the current URI contains state information (e.g. if the user clicked on a SemantEco URI in an email), then the data available in the jQuery BBQ state will be used to update the input elements so that they agree. SemantEcoUI also adds state change handlers to every $input$ element so that when the user adjusts the input, the change propagates to the jQuery BBQ state.
+
+In the event that a \texttt{Module} wishes to provide a facet but does not want the state information to be transmitted to the server (e.g. because the state is for client-side processing only), then the \texttt{div} can also be given the class ``no-rest'', which informs SemantEco that the parameters related to that module should be stripped from the state prior to any server communication. This operation is accomplished by SemantEco.prepareArgs, which is called whenever the client calls one of the RESTful interfaces to the server (i.e. those methods auto-generated from QueryMethods as discussed in Section~\ref{client-server-comm}).
+
 \section{Hierarchical Search with JSTree}
 \label{hierarchical-search}
 In this section we will discuss how SemantEco modules can present hierarchical search facets using OWL ontologies.
