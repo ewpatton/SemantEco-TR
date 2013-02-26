@@ -82,6 +82,9 @@ SemantEco is, at its core, a Java Servlet 3.0\footnote{http://jcp.org/aboutJava/
 
 The SemantEco servlet is, at its core, a `plug-and-play' architecture. The servlet mostly provides glue code that is responsible for combining functionality of different modules. A \textit{module} is a self-contained Java Archive that provides functionality to SemantEco via different methods. The specifics of how modules work will be discussed in Chapter~\ref{writing-modules}.
 
+\subsection{Initialization of SemantEco on Deployment} 
+When the servlet container starts or when a developer uses the maven tomcat7:deploy goal, the first action taken after the SemantEcoServlet is constructed is a call by the container to the init method per the Java Servlet 3.0 specification. During this initialization, SemantEco configures any missing directories, initializes its logging system (log4j), and sets up the module manager, which includes loading all prepackaged modules in the Web archive (war) file.
+
 \subsection{Special URL Patterns}
 \label{url-patterns}
 The SemantEco responds to a number of URL patterns that require custom processing. These include:
@@ -99,6 +102,7 @@ The SemantEco responds to a number of URL patterns that require custom processin
 SemantEco modules are maintained by a class called the \texttt{ModuleManager}. The \texttt{ModuleManager} is responsible for loading modules from their JAR files and configuring them. If a module is removed from SemantEco, the \texttt{ModuleManager} will delete the module instance and unload the module files from the class path. The \texttt{ModuleManager} is also responsible for constructing the user interface and semantic models and modifying queries before they are executed. It accomplishes these tasks by consulting the available modules.
 
 \subsection{Installing Modules}
+\label{installing-modules}
 \texttt{ModuleManager} uses the Apache Virtual File System\footnote{http://commons.apache.org/vfs/} to actively monitor the modules directory and respond to the addition or deletion of modules. During servlet initialization, the \texttt{ModuleManager} will actively scan the directory and fire addition events for each module available at that time to bootstrap the entire process. When a module is added the following steps occur:
 
 \begin{enumerate}
@@ -138,6 +142,18 @@ The \texttt{ModuleConfiguration} object provides a number of useful methods for 
 
 \section{The Query Executor}
 \label{query-executor}
+The \texttt{QueryExecutor} interface provides the primary method for modules to query the SemantEco knowledge base and interact with external SPARQL services via the Query object. It also provides methods for properly forming HTTP requests to external services to ease in module development by hiding many of the details related to calling remote services. Each QueryExecutor implementation must implement the following public methods:
+
+\begin{itemize}
+\item execute(Query) - Executes the specified query against the default endpoint and returns the response as a String.
+\item execute(Query, Model) - Executes the specified query against the default endpoint and loads the response into the provided Jena model. This method only is valid for Query objects that are of type CONSTRUCT or DESCRIBE and thus return an RDF graph.
+\item execute(String, Query) - Executes the specified query against the specified endpoint and returns the response as a String.
+\item execute(String, Query, Model) - Executes the specified query against the specified endpoint and loads the response into the provided Jena model. The conditions on execute(Query, Model) also apply here.
+\item getDefaultSparqlEndpoint() - Returns the default SPARQL endpoint. This will either be the SemantEco default or the module specific endpoint specified in the module's properties file (see subsection~\ref{installing-modules}).
+\item accept(String) - Adds a MIME type to the Accept HTTP header, e.g. "application/json" or "text/turtle". This returns a clone of the QueryExecutor with appropriate modifications so that calls can be chained together to add multiple types and immediately perform an execution.
+\item executeLocalQuery(Query) - Performs a local query over the knowledge base by obtaining the combined model via the current Request object (see subsection~\ref{request-object}).
+\end{itemize}
+
 In this section we will introduce the Query Executor as the key tool for modules to interact with both external triple stores and the local model. We will also discuss how the Query Executor interfaces with the Module Manager so that the various modules can all augment a query prior to it being executed.
 
 \section{Client-Server Communication}
@@ -164,6 +180,7 @@ The JavaScript generator is a utility class that is responsible for standardizin
 \end{enumerate}
 
 \subsubsection{The Request Object}
+\label{request-object}
 When a \texttt{QueryMethod} is called from a client, it is intercepted by the SemantEco servlet's \texttt{doGet} method. This method identifies the request as a RESTful call to a module and proceeds to parse the parameters sent by the client into the appropriate types. This information is then encapsulated in a \texttt{Request} object that can be passed to the module/method combination identified in the URL. In addition to providing modules access to the parameters of a REST call, the \texttt{Request} object also provides the following methods:
 
 \begin{itemize}
@@ -207,9 +224,25 @@ In this section we will guide the reader through examples of how to model subcla
 \section{Querying the Model}
 \label{querying}
 In this section we will instruct the reader how to make use of the semantic model to simplify queries.
+
+
 \chapter{User Interface}
 \label{user-interface}
 In this chapter we will provide an overview of the different components in the SemantEco interface and how modules use them to provide users with tools for controlling data search.
+
+\section{The Semantic Entry Point: index.jsp} 
+When a user opens SemantEco in her browser, the servlet container compiles and executes the Java Servlet Page (JS) index.jsp, which can be found in SemantEco's webapp directory. This file provides the primary interface for users to access data provided by the various SemantEco modules and it is automatically generated through the use of a tag library and the SemantEcoUI object constructed by the ModuleManager when it visits each of the available modules, which will be discussed in Section~\ref{facets}.
+
+\subsection{The SemantEco Tag Library}
+SemantEco provides a Java Servlet Page tag library that simplifies the generation of the main page by condensing references to the various scripts, stylesheets, and facets provided by the different modules into three separate tags: \texttt{<module:scripts />}, \texttt{<module:styles />}, and \texttt{<module:facets />}. The module namespace is explicitly defined by the Tag Library Description (TLD) \texttt{WEB-INF/semanteco.tld} in the web application. The implementations of the tag handlers for these tags are located in the \texttt{edu.rpi.tw.escience.semanteco.taglib} package. For a complete overview of JSP tag handlers see \cite{JSPTagHandlers}.
+
+\subsubsection{The Scripts Tag}
+
+\subsubsection{The Styles Tag}
+
+\subsubsection{The Facets Tag}
+
+
 \section{Map Interface}
 \label{maps}
 In this section we will discuss how SemantEco presents known sites on a map interface.
