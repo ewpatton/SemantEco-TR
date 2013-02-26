@@ -157,7 +157,15 @@ The \texttt{QueryExecutor} interface provides the primary method for modules to 
 \item executeLocalQuery(Query) - Performs a local query over the knowledge base by obtaining the combined model via the current Request object (see subsection~\ref{request-object}).
 \end{itemize}
 
-In this section we will introduce the Query Executor as the key tool for modules to interact with both external triple stores and the local model. We will also discuss how the Query Executor interfaces with the Module Manager so that the various modules can all augment a query prior to it being executed.
+For most modules, the general flow of information involving the \texttt{QueryExecutor} proceeds in the following way:
+
+\begin{enumerate}
+\item Construct a \texttt{Query} object and add appropriate triple patterns.
+\item If the query is a CONSTRUCT or DESCRIBE query, construct a Jena \texttt{Model} object via Jena's \texttt{ModelFactory}.
+\item Set the appropriate accept header using \texttt{accept()} and then call the appropriate execute method, e.g. \texttt{config.getQueryExecutor().accept("application/json").execute(myQuery);}
+\end{enumerate}
+
+Prior to execution of a query, the \texttt{QueryExecutor} calls the \texttt{ModuleManager}'s \texttt{augmentQuery(Query, Request, Module)} method. This causes the \texttt{ModuleManager} to pass each \texttt{Module} the query object so that they may add any additional triple patterns based on the parameters passed in the current state (encapsulated within the \texttt{Request} object). Modules are visited in the order that they were instantiated by the \texttt{ModuleManager} when the servlet was initialized. The final \texttt{Module} parameter is used by the \texttt{ModuleManager} to ensure termination by preventing an infinite loop in the event a \texttt{Module} creates and executes a \texttt{Query} from within its own \texttt{visit(Query, Request)} method---it is assumed that a \texttt{Module} has done everything it needs to do to construct the query prior to executing it.
 
 \section{Client-Server Communication}
 \label{client-server-comm}
