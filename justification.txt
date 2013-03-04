@@ -1,0 +1,7 @@
+
+justification why module querymethods cannot be used outside of framework:
+
+if i source all that is sourced in index.jsp but do not run initialize(), will I be able
+to call appropriate query methods?
+
+

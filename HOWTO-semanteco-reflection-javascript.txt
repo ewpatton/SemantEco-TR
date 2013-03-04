@@ -1,0 +1,10 @@
+SemantEcoServlet#printAjax is what generates the client-side code
+
+it primarily relies on the JavaScriptGenerator in the util package
+
+that's where it reflects on the module's class and examines for QueryMethods
+
+
+JavaScriptGenerator.java has ajaxForModule called from SemantEco#printAjax.
+create the object label and functions from module object methods, and callls
+processMethod(cls,m).

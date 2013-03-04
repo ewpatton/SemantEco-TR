@@ -1,0 +1,37 @@
+
+SpeciesDataProviderModule.queryeBirdTaxonomyRoots({}, function(d)
+{ console.log(d); });
+
+is converted into:
+
+http://localhost:8081/semanteco/rest/SpeciesDataProviderModule/queryeBirdTaxonomyRoots?source=%5B%22http%3A%2F%2FsbcFish%23%22%2C%22http%3A%2F%2Febird%23%22%2C%22http%3A%2F%2Fsparql.tw.rpi.edu%2Fsource%2Fepa-gov%22%2C%22http%3A%2F%2Fsparql.tw.rpi.edu%2Fsource%2Fusgs-gov%22%5D&domain=%5B%22http%3A%2F%2Fwas.tw.rpi.edu%2Fsemanteco%2Fair%2Fair.owl%23%22%2C%22http%3A%2F%2Fescience.rpi.edu%2Fontology%2Fsemanteco%2F2%2F0%2Fbird.owl%23%22%2C%22http%3A%2F%2Fescience.rpi.edu%2Fontology%2Fsemanteco%2F2%2F0%2Ffish.owl%23%22%2C%22http%3A%2F%2Fescience.rpi.edu%2Fontology%2Fsemanteco%2F2%2F0%2Fwater.owl%23%22%5D&industry=&regulation.air=http%3A%2F%2Fwas.tw.rpi.edu%2Fsemanteco%2Fregulations%2FEPA-air-regulation.owl&regulation.water=http%3A%2F%2Fescience.rpi.edu%2Fontology%2Fsemanteco%2F2%2F0%2FEPA-regulation.owl&time=
+
+from your index-exper.jsp:
+(http://localhost:8081/semanteco/index-exper.jsp)
+
+http://localhost:8080/semanteco/rest/SpeciesDataProviderModule/queryeBirdTaxonomyRoots
+
+Here is the fix:
+it won't work if you are resetting your localhost to not 8080, because some configuration file will not load correctly. 
+
+
+if I do the following:
+
+SemantEco.restBaseUrl="http://localhost:8081/semanteco/rest/";
+"http://localhost:8081/semanteco/rest/"
+SemantEco.baseUrl="http://localhost:8081/semanteco/";
+"http://localhost:8081/semanteco/"
+
+and then call:
+
+SpeciesDataProviderModule.queryeBirdTaxonomyRoots({}, function(d)
+{ console.log(d); });
+
+it works!
+
+so do the following:
+load:
+http://localhost:8081/semanteco/index-exper.jsp
+
+then reset restBaseUrl and baseUrl as above,
+then call the queryeBirdTaxoomyRoots method.

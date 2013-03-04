@@ -1,0 +1,35 @@
+document.getElementById('tree');
+
+class_hierachy[1][2]
+"http://ebird#Struthioniformes"
+
+
+SemantAqua.limit = 50
+
+
+$("a[title]").attr("title","Home\
+Blah\
+Blah")
+
+
+DataTypeModule
+
+
+Debugger.open()
+Debugger.close()
+
+
+what is this colon notation?  SemantAquaUI.infowindow=new google.maps.InfoWindow({
+            content:SemantAquaUI.infowindowcontainer
+        });
+        
+        
+        
+        {} indicates a dictionary, "key":value is how you specify the key, value pairs in the dictionary
+        
+        
+        
+        so Google Maps API stipulates that the content key should contain either a string containing HTML content or
+         a DOM element to use as the content of the info window
+         so infowindowcontainer is a <div> element that provides the content of the info window
+

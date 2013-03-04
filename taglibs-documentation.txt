@@ -1,0 +1,33 @@
+
+SemantEco provides a JSP tag library that simplifies the generation of the main page by condensing references to the various scripts, stylesheets, and facets provided by the different modules into three separate tags: <module:scripts />, <module:stylesheets />, and <module:facets />. The implementations of the tag handlers for these tags are located in the edu.rpi.tw.escience.semanteco.taglib package. For a complete overview of JSP tag handlers see [1].
+
+[1] Oracle. Custom Tags in JSP Pages. 2010. In The Java 5 EE Tutorial. http://docs.oracle.com/javaee/5/tutorial/doc/bnalj.html. Last accessed 2013-02-23.
+
+http://www.tutorialspoint.com/jsp/jsp_standard_tag_library.htm
+The JavaServer Pages Standard Tag Library (JSTL) is a collection of useful JSP tags which encapsulates core functionality common to many JSP applications.
+
+
+in webapp/src/main/webapp/index.jsp:
+<%@ taglib uri="/WEB-INF/semanteco.tld" prefix="module" %>
+
+/Users/apseyed/Documents/rpi/SemantEco/webapp/src/main/webapp/WEB-INF/semanteco.tld
+in here it describes "scripts", "styles" and "facets that are in respective package edu.rpi.tw.escience.semanteco.taglib.
+each java file in /Users/apseyed/Documents/rpi/SemantEco/webapp/src/main/java/edu/rpi/tw/escience/semanteco/taglib
+extends TagSupport but does not have javadocs.
+
+/Users/apseyed/Documents/rpi/SemantEco/webapp/src/main/java/edu/rpi/tw/escience/semanteco/taglib
+in FacetTag.java doStartTag is an override , 
+
+these classes import the following:
+import edu.rpi.tw.escience.semanteco.res.JspResource;
+import edu.rpi.tw.escience.semanteco.res.OwnedResource;
+import edu.rpi.tw.escience.semanteco.ui.SemantEcoUIFactory;
+import edu.rpi.tw.escience.semanteco.Resource;
+import edu.rpi.tw.escience.semanteco.SemantEcoUI;
+import edu.rpi.tw.escience.semanteco.util.NameUtils;
+
+where are the tags used? well searching for "<module:facets />" this is used in webapp/src/main/webapp/index.jsp
+so index.jsp uses the following tags to execute java:
+<module:styles />
+<module:scripts />
+<module:facets />

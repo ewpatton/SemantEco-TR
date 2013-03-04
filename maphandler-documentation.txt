@@ -1,0 +1,10 @@
+As for map handler, that was probably an incorrect term to use. I'm
+referring to the two methods that a data provider module uses to
+identify icons and whether a marker should be visible or not. When any
+data provider (e.g. the SpeciesDataProviderModule) initializes, it
+calls those methods on the DataTypeModule so the module knows how to
+render content on the map. This is what I mean about how the different
+modules interact and as the code is currently written you can't choose
+them piecemeal from index.jsp the way Robin has gone about it. If you
+wanted all of the immediate functionality you would have implemented
+it in the same way as the debugger.

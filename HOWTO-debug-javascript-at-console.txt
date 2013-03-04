@@ -1,0 +1,3 @@
+Sources, go to javascript, click on the line to set a breakpoint.
+Then you can type the variable to inspect it.
+this way you can inspect a local variable that otherwise you won't access in the console after execution is complete.
