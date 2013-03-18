@@ -202,7 +202,7 @@ The JavaScript generator is a utility class that is responsible for standardizin
 
 \subsubsection{The Request Object}
 \label{request-object}
-When a \texttt{QueryMethod} is called from a client, it is intercepted by the SemantEco servlet's \texttt{doGet} method. This method identifies the request as a RESTful call to a module and proceeds to parse the parameters sent by the client into the appropriate types. This information is then encapsulated in a \texttt{Request} object that can be passed to the module/method combination identified in the URL. In addition to providing modules access to the parameters of a REST call, the \texttt{Request} object also provides the following methods:
+When a \texttt{QueryMethod} is called from a client, it is intercepted by the SemantEco servlet's \texttt{doGet} method. This method identifies the request as a RESTful call to a module and proceeds to parse the parameters sent by the client into the appropriate types. This information is then encapsulated in a \texttt{Request} object (realized by the \texttt{ClientRequest} class) that can be passed to the module/method combination identified in the URL. In addition to providing modules access to the parameters of a REST call, the \texttt{Request} object also provides the following methods:
 
 \begin{itemize}
 \item\textbf{getLogger} - Gets an Apache log4j Logger customized for the specific request if the client sent a valid identifier for a known WebSocket outbound channel (see Section~\ref{debugging-techniques} for more details).
