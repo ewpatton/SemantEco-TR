@@ -1,0 +1,2 @@
+the project specific settings are webapp/pom.xml , two places port and baseURL
+it can be overriden by ~/.m2/settings.xml
