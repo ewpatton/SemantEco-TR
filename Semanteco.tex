@@ -293,9 +293,30 @@ In this section we will discuss how SemantEco modules can present hierarchical s
 \section{Charting with jqPlot}
 \label{visualization}
 In this section we will discuss the use of jqPlot to provide data visualizations for the user.
+
 \chapter{Writing Modules}
 \label{writing-modules}
-In this chapter we will detail the process of writing a module for SemantEco so that interested parties can provide extensions that complement the existing modules.
+In the previous chapters we have discussed the modular architecture that SemantEco uses for combining data, ontologies, and queries together to make a functioning system for data integration. Modules are a critical part of SemantEco and are responsible for providing functional components for the application. In this chapter, we introduce the process of constructing a new module and writing its visitor methods to provide functionality. Module authors should familiarize themselves with the Maven build system\footnote{See \url{http://maven.apache.org/}} used by SemantEco for packaging its artifacts. 
+
+\section{Creating a New Module}
+We provide a Maven archetype to assist module authors in the basic setup and creation of a new module. This archetype is provided both in source and via the Tetherless World maven repository. This section details how to use each system to bootstrap a module.
+
+\subsection{Bootstrapping from Source}
+Clone the SemantEco Git repository:
+
+\begin{verbatim}
+git clone https://github.com/ewpatton/SemantEco.git
+\end{verbatim}
+
+Within the SemantEco repository is a directory called \texttt{module-archetype}. Change into that directory and build the archetype with \texttt{mvn clean install}. This will cause Maven to build the archetype and install it into the local repository.
+
+\subsection{Bootstrapping using Tetherless World's Maven Repository}
+Note, prior to version 4.1 authors may need to amend the generated pom.xml file to include a reference to the Tetherless World Maven repository so that Maven can find the appropriate parent artifacts (see Appendix \ref{maven-build-system} for more details).
+\begin{verbatim}
+mvn archetype:generate \
+    -DarchetypeCatalog=https://orion.tw.rpi.edu/artifactory/libs-release-local/
+\end{verbatim}
+
 \section{The ProvidesDomain Interface}
 In this section we discuss how to declare new domains for SemantEco.
 \section{Ontology Construction}
@@ -352,6 +373,7 @@ In this chapter we will present our conclusions.
 
 \appendix
 \chapter{Maven Build System}
+\section{maven-build-system}
 SemantEco uses the Apache Maven\footnote{\url{http://maven.apache.org/}} build system to handle its build process. Each component of SemantEco is a module in a top-level Maven POM file. Development of stand-alone modules can reference the build artifacts via Tetherless World's Artifactory installation. To do so, one must put the following snippet in their module's pom.xml:
 
 \begin{lstlisting}
