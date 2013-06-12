@@ -6,6 +6,10 @@
 *.lot
 *.out
 *.toc
+*.ilg
+*.idx
+*.ind
+*.lol
 Semanteco.pdf
 
 .query-from-console.txt.swp
