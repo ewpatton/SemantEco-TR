@@ -12,34 +12,30 @@
 *.lol
 Semanteco.pdf
 
-.query-from-console.txt.swp
+.DS_Store
 
 .loading.txt.swp
 
-.taglibs-documentation.txt.swp
+.query-from-console.txt.swp
 
-HOWTO-debug-javascript-at-console.txt
+*.swp
 
-HOWTO-debugging-javascript-chen-work.txt
+*.aux
 
-HOWTO-javadocs.txt
+*.lof
 
-HOWTO-semanteco-reflection-javascript.txt
+*.gz
 
-Semanteco.synctex.gz
-
-brief-module-description.txt
-
-chen-readme.txt
-
-justification.txt
-
-loading.txt
-
-maphandler-documentation.txt
-
-query-from-console.txt
+*.txt
 
 semanteco-tr-cmap.cmap
 
-taglibs-documentation.txt
+Semanteco.log
+
+Semanteco.lot
+
+Semanteco.out
+
+Semanteco.pdf
+
+Semanteco.toc
